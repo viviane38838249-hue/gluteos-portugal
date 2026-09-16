@@ -38,7 +38,7 @@ requestAnimationFrame(animarProgresso);}
 function finalizarProcessamento(){if(progressBar){progressBar.style.width="100%";}
 atualizarChecklist(TOTAL_ETAPAS);setTimeout(function(){if(loadingScreen){loadingScreen.style.display="none";}
 document.body.style.background='';document.documentElement.style.background='';if(themeColor){themeColor.setAttribute('content','#FFFFFF');}
-if(typeof enviarLeadAlServidor==='function'){enviarLeadAlServidor(true);}window.location.href='/offer';},700);}
+if(typeof enviarLeadAlServidor==='function'){enviarLeadAlServidor(true);}window.location.href='offer/index.html';},700);}
 executarEtapa(0);}
 function validarCampo(idCampo,numeroAvanco){const campo=document.getElementById(idCampo);if(!campo)return false;if(campo.value.trim()===''){tremer(campo);campo.focus();return false;}
 showQuestion(numeroAvanco);return true;}
