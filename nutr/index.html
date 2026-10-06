@@ -246,8 +246,6 @@
   ════════════════════════════════════════ -->
 <div class="active" id="vsl-section">
 <div class="w-full text-center mb-4 relative" style="max-width: min(400px, calc((100vh - 180px) * 9 / 16));">
-<!-- Botão invisível de teste mantido para não alterar a lógica existente -->
-<button class="absolute right-0 top-0 w-12 h-12 opacity-0 cursor-pointer z-50" onclick="testShowWidget()"></button>
 <span class="inline-block text-white text-[11px] font-black px-5 py-1.5 rounded-full uppercase tracking-wider mb-2 border border-pink-300/40 shadow-[0_0_18px_rgba(240,98,154,0.45)]" style="background:linear-gradient(90deg,#ff5b9d,#df5fb3);">
         ACCESO EXCLUSIVO CONFIRMADO
       </span>
@@ -501,19 +499,39 @@
         s.src = 'https://scripts.converteai.net/24d84a3f-2c18-4f12-81a3-22624f1bb989/players/6ac43c5de103ef34430871a1/v4/player.js';
         s.async = true;
         document.head.appendChild(s);
-        // Reveal CTA at 3:06 (186s)
-        setTimeout(function () {
-          if (!window.widgetLoaded) window.testShowWidget();
-        }, 186000);
-      }
+        // Liberta o CTA SOMENTE quando a VSL atingir 13:25 de reprodução real (805s).
+        // Usa a API oficial do VTurb, por isso pausas na VSL não contam como tempo assistido.
+        var player = document.querySelector('vturb-smartplayer#vid-6ac43c5de103ef34430871a1');
+        if (player) {
+          var revealCTA = function () {
+            if (window.widgetLoaded) return;
+            window.widgetLoaded = true;
+            var c = document.getElementById('cta-vsl-container');
+            if (!c) return;
+            c.classList.add('visible');
+            c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          };
 
-      window.testShowWidget = function() {
-        if (window.widgetLoaded) return;
-        window.widgetLoaded = true;
-        var c = document.getElementById('cta-vsl-container');
-        c.classList.add('visible');
-        c.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      };
+          var bindVturbDelay = function () {
+            // Se a pessoa retomou a VSL depois de 13:25, liberta o CTA imediatamente.
+            if (Number(player.currentTime || 0) >= 805) {
+              revealCTA();
+              return;
+            }
+            if (typeof player.onTime === 'function') {
+              player.onTime(805, revealCTA);
+            } else if (typeof player.displayHiddenElements === 'function') {
+              player.displayHiddenElements(805, ['#cta-vsl-container'], {
+                display: 'block',
+                persist: false,
+                callback: revealCTA
+              });
+            }
+          };
+
+          player.addEventListener('player:ready', bindVturbDelay, { once: true });
+        }
+      }
 
       function showTSL() {
         // /nutr é uma página de pré-compra; todos os visitantes devem ver a VSL.
