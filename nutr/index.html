@@ -21,9 +21,6 @@
 <link href="https://scripts.converteai.net" rel="dns-prefetch"/>
 <link href="https://images.converteai.net" rel="dns-prefetch"/>
 <link href="https://license.vturb.com" rel="dns-prefetch"/>
-<!-- Hotmart Sales Funnel Widget loader -->
-<link href="https://checkout.hotmart.com" rel="dns-prefetch"/>
-<script src="js/hotmart-checkout-elements.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&amp;family=Playfair+Display:ital,wght@0,700;1,700&amp;display=swap" rel="stylesheet"/>
 <style>
@@ -269,8 +266,10 @@
 <div class="w-full mt-4 text-center" id="cta-vsl-container" style="max-width: min(400px, calc((100vh - 180px) * 9 / 16));">
 <!-- Seta animada -->
 <svg class="widget-arrow" fill="none" height="40" stroke="#22c55e" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewbox="0 0 24 24" width="40" xmlns="http://www.w3.org/2000/svg"><path d="M12 4v16M19 13l-7 7-7-7"></path></svg>
-<!-- HOTMART - Sales Funnel Widget -->
-<div id="hotmart-funnel-vsl"></div>
+<a id="checkout-vsl-btn" class="cta-btn" href="https://pay.hotmart.com/P107627386K?checkoutMode=10" onclick="return goToCheckout(event)">
+  🔥 QUERO GARANTIR O MEU ACESSO POR 9,90 €
+</a>
+<p class="cta-sub" style="color:rgba(255,255,255,.75); margin-top:10px;">🔒 Pagamento seguro · Acesso imediato · Garantia de 45 dias</p>
 </div>
 </div>
 <!-- ════════════════════════════════════════
@@ -481,23 +480,25 @@
       var BLOCKED = ['BR', 'CN'];
       var CACHE_KEY = 'geo_country';
 
-      // Mount the Hotmart Sales Funnel widget into the given container.
-      // Only one section (VSL or TSL) is shown per session, so only one mounts.
-      var hotmartMounted = false;
-      function mountHotmart(selector) {
-        if (hotmartMounted) return;
-        if (window.checkoutElements && window.checkoutElements.init) {
-          hotmartMounted = true;
-          try { window.checkoutElements.init('salesFunnel').mount(selector); } catch (e) {}
-        } else {
-          setTimeout(function () { mountHotmart(selector); }, 200);
-        }
-      }
+      // /nutr é uma página de pré-compra: o checkout é aberto apenas após a VSL liberar o CTA.
+      // Não usamos o Sales Funnel Widget aqui, pois ele exige uma compra já em andamento.
+      window.goToCheckout = function (event) {
+        if (event) event.preventDefault();
+        var checkout = new URL('https://pay.hotmart.com/P107627386K?checkoutMode=10');
+        var current = new URLSearchParams(window.location.search);
+        current.forEach(function (value, key) {
+          if (key !== 'checkoutMode') checkout.searchParams.set(key, value);
+        });
+        window.location.href = checkout.toString();
+        return false;
+      };
 
       function showVSL() {
+        if (window.__nutrVslStarted) return;
+        window.__nutrVslStarted = true;
         document.body.style.visibility = 'visible';
         document.getElementById('vsl-section').classList.add('active');
-        // Load VTurb player only for non-blocked users
+        // Load VTurb player
         var s = document.createElement('script');
         s.src = 'https://scripts.converteai.net/24d84a3f-2c18-4f12-81a3-22624f1bb989/players/6ac43c5de103ef34430871a1/v4/player.js';
         s.async = true;
@@ -513,14 +514,12 @@
         window.widgetLoaded = true;
         var c = document.getElementById('cta-vsl-container');
         c.classList.add('visible');
-        mountHotmart('#hotmart-funnel-vsl');
         c.scrollIntoView({ behavior: 'smooth', block: 'center' });
       };
 
       function showTSL() {
-        document.body.style.visibility = 'visible';
-        document.getElementById('tsl-section').classList.add('active');
-        mountHotmart('#hotmart-funnel-tsl');
+        // /nutr é uma página de pré-compra; todos os visitantes devem ver a VSL.
+        showVSL();
       }
 
       window.scrollToTslWidget = function () {
@@ -529,7 +528,7 @@
 
       function handleCode(code) {
         if (code) sessionStorage.setItem(CACHE_KEY, code);
-        if (code && BLOCKED.indexOf(code) !== -1) { showTSL(); } else { showVSL(); }
+        showVSL();
       }
 
       // Use cached result if available
