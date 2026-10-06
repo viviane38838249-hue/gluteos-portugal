@@ -247,13 +247,13 @@
 <div class="active" id="vsl-section">
 <div class="w-full text-center mb-4 relative" style="max-width: min(400px, calc((100vh - 180px) * 9 / 16));">
 <span class="inline-block text-white text-[11px] font-black px-5 py-1.5 rounded-full uppercase tracking-wider mb-2 border border-pink-300/40 shadow-[0_0_18px_rgba(240,98,154,0.45)]" style="background:linear-gradient(90deg,#ff5b9d,#df5fb3);">
-        ACCESO EXCLUSIVO CONFIRMADO
+        ACESSO EXCLUSIVO CONFIRMADO
       </span>
 <h1 class="text-[25px] font-black text-white uppercase leading-tight drop-shadow-2xl mb-1">
-        ¡FUISTE <span class="text-[#f0629a]">SELECCIONADA!</span>
+        FOSTE <span class="text-[#f0629a]">SELECIONADA!</span>
       </h1>
 <p class="text-white/90 text-[12px] font-medium leading-snug mb-1">
-        Tu vídeo ha comenzado, míralo y desbloquea el protocolo.
+        O teu vídeo já começou. Vê-o e desbloqueia o protocolo.
       </p>
 </div>
 <div class="w-full rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(240,98,154,0.3)]" style="max-width: min(400px, calc((100vh - 180px) * 9 / 16));">
@@ -262,7 +262,7 @@
 <div class="w-full mt-4 text-center" id="cta-vsl-container" style="max-width: min(400px, calc((100vh - 180px) * 9 / 16));">
 <!-- Seta animada -->
 <svg class="widget-arrow" fill="none" height="40" stroke="#22c55e" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewbox="0 0 24 24" width="40" xmlns="http://www.w3.org/2000/svg"><path d="M12 4v16M19 13l-7 7-7-7"></path></svg>
-<a id="checkout-vsl-btn" class="cta-btn" href="https://pay.hotmart.com/P107627386K?checkoutMode=10" onclick="return goToCheckout(event)">
+<a id="offer-vsl-btn" class="cta-btn" href="/offer/" onclick="return goToOffer(event)">
   🔥 QUERO GARANTIR O MEU ACESSO POR 9,90 €
 </a>
 <p class="cta-sub" style="color:rgba(255,255,255,.75); margin-top:10px;">🔒 Pagamento seguro · Acesso imediato · Garantia de 45 dias</p>
@@ -478,14 +478,10 @@
 
       // /nutr é uma página de pré-compra: o checkout é aberto apenas após a VSL liberar o CTA.
       // Não usamos o Sales Funnel Widget aqui, pois ele exige uma compra já em andamento.
-      window.goToCheckout = function (event) {
+      window.goToOffer = function (event) {
         if (event) event.preventDefault();
-        var checkout = new URL('https://pay.hotmart.com/P107627386K?checkoutMode=10');
-        var current = new URLSearchParams(window.location.search);
-        current.forEach(function (value, key) {
-          if (key !== 'checkoutMode') checkout.searchParams.set(key, value);
-        });
-        window.location.href = checkout.toString();
+        var destination = '/offer/' + window.location.search;
+        window.location.href = destination;
         return false;
       };
 
